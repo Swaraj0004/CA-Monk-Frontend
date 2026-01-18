@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getBlogById } from "@/services/blogApi";
 import { Button } from "@/components/ui/button";
 import { Share2, ThumbsUp, MessageSquare } from "lucide-react";
+import BlogDetailSkeleton from "./BlogDetailSkeleton";
 
 export default function BlogDetail({ blogId }: { blogId: string }) {
   const { data, isLoading, isError } = useQuery({
@@ -10,11 +11,15 @@ export default function BlogDetail({ blogId }: { blogId: string }) {
   });
 
   if (isLoading) {
-    return <p className="p-6 text-gray-500">Loading article…</p>;
+    return <BlogDetailSkeleton />;
   }
 
   if (isError || !data) {
-    return <p className="p-6 text-red-500">Article not found</p>;
+    return (
+      <p className="p-6 text-red-500">
+        Article not found
+      </p>
+    );
   }
 
   const paragraphs = data.content.split("\n\n");
@@ -68,7 +73,7 @@ export default function BlogDetail({ blogId }: { blogId: string }) {
 
       {/* Article Content */}
       <div className="mt-8 space-y-6 leading-relaxed text-gray-700">
-        {paragraphs.map((para: string, idx: number) => (
+        {paragraphs.map((para, idx) => (
           <p key={idx}>{para}</p>
         ))}
       </div>

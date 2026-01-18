@@ -1,37 +1,46 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { getBlogs } from "@/services/blogApi";
 import BlogCard from "./BlogCard";
+import BlogListSkeleton from "./BlogListSkeleton";
 import { Blog } from "@/types/blog";
 
 export default function BlogList({
   selectedId,
   onSelect,
 }: {
-  selectedId: string | null;         
-  onSelect: (id: string) => void;    
+  selectedId: string | null;
+  onSelect: (id: string) => void;
 }) {
-  const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading, isError } = useQuery<Blog[]>({
+    queryKey: ["blogs"],
+    queryFn: getBlogs,
+  });
 
-  useEffect(() => {
-    getBlogs().then((data) => {
-      setBlogs(data);
-      setLoading(false);
-    });
-  }, []);
-
-  if (loading) {
-    return <p className="text-sm text-gray-500">Loading articles…</p>;
+  if (isLoading) {
+    return <BlogListSkeleton />;
   }
+
+  if (isError || !data) {
+    return (
+      <p className="text-sm text-red-500">
+        Failed to load articles
+      </p>
+    );
+  }
+
+  const sortedBlogs = [...data].sort(
+    (a, b) =>
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
 
   return (
     <div className="h-[calc(100vh-220px)] space-y-4 overflow-y-auto pr-2 scrollbar-hide">
-      {blogs.map((blog) => (
+      {sortedBlogs.map((blog) => (
         <BlogCard
-          key={blog.id}                    
+          key={blog.id}
           blog={blog}
-          isActive={blog.id === selectedId}    
-          onClick={onSelect}                   
+          isActive={blog.id === selectedId}
+          onClick={onSelect}
         />
       ))}
     </div>

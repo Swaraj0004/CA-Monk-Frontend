@@ -2,6 +2,7 @@ import { Blog } from "@/types/blog";
 import { Badge } from "@/components/ui/badge";
 import clsx from "clsx";
 import { categoryConfig } from "./categoryConfig";
+import { timeAgo } from "@/utils/timeAgo";
 
 export default function BlogCard({
   blog,
@@ -10,19 +11,19 @@ export default function BlogCard({
 }: {
   blog: Blog;
   isActive: boolean;
-  onClick: (id: string) => void; 
+  onClick: (id: string) => void;
 }) {
-  const category = blog.category[0];
-  const config = categoryConfig[category];
-  const Icon = config?.icon;
+  const primaryCategory = blog.category[0];
+  const primaryConfig = categoryConfig[primaryCategory];
+  const Icon = primaryConfig?.icon;
 
   return (
     <div
-      onClick={() => onClick(blog.id)} 
+      onClick={() => onClick(blog.id)}
       className={clsx(
-        "relative cursor-pointer rounded-xl border bg-white p-4 transition",
+        "relative cursor-pointer rounded-xl border bg-white p-4 transition-all duration-300",
         isActive
-          ? "border-purple-500 shadow-md"
+          ? "border-purple-500 shadow-lg"
           : "hover:shadow-sm"
       )}
     >
@@ -34,10 +35,10 @@ export default function BlogCard({
       {/* Top row */}
       <div className="mb-2 flex items-center justify-between text-xs text-gray-500">
         <div className="flex items-center gap-2 font-semibold uppercase">
-          {Icon && <Icon size={14} className={config.color} />}
-          <span>{category}</span>
+          {Icon && <Icon size={14} className={primaryConfig?.color} />}
+          <span>{primaryCategory}</span>
         </div>
-        <span>2 days ago</span>
+        <span>{timeAgo(blog.date)}</span>
       </div>
 
       {/* Title */}
@@ -50,15 +51,23 @@ export default function BlogCard({
         {blog.description}
       </p>
 
-      {/* Badge */}
-      <Badge
-        className={clsx(
-          "rounded-full px-2 py-0.5 text-xs",
-          config?.badge ?? "bg-gray-100 text-gray-700"
-        )}
-      >
-        {category}
-      </Badge>
+      {/* Category badges */}
+      <div className="flex flex-wrap gap-2">
+        {blog.category.map((cat) => {
+          const cfg = categoryConfig[cat];
+          return (
+            <Badge
+              key={cat}
+              className={clsx(
+                "rounded-full px-2 py-0.5 text-xs",
+                cfg?.badge ?? "bg-gray-100 text-gray-700 hover:text-white"
+              )}
+            >
+              {cat}
+            </Badge>
+          );
+        })}
+      </div>
     </div>
   );
 }

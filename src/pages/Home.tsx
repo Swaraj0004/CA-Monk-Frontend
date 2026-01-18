@@ -1,6 +1,7 @@
 import { useState } from "react";
 import BlogList from "@/components/blog/BlogList";
 import BlogDetail from "@/components/blog/BlogDetail";
+import CreateBlogForm from "@/components/blog/CreateBlogForm";
 
 export default function Home() {
 
@@ -11,6 +12,7 @@ export default function Home() {
       
       {/* LEFT PANEL */}
       <aside className="md:col-span-4">
+        <CreateBlogForm />
         <h2 className="mb-4 text-sm font-semibold text-gray-700">
           Latest Articles
         </h2>
